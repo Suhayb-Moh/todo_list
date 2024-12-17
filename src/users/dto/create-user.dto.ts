@@ -4,7 +4,9 @@ import {
   MaxLength,
   MinLength,
   IsEmail,
+  Validate,
 } from 'class-validator';
+import { IsUniqueEmail } from 'util/validators/is-unique-email.validator';
 
 export class CreateUserDto {
   @IsNotEmpty({
@@ -24,6 +26,7 @@ export class CreateUserDto {
       message: 'Invalid email format',
     },
   )
+  @Validate(IsUniqueEmail)
   email: string;
 
   @IsNotEmpty({

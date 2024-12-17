@@ -1,27 +1,25 @@
 import { Module } from '@nestjs/common';
-
 import { CategoriesModule } from './categories/categories.module';
-import { TasksService } from './tasks/tasks.service';
-import { TasksController } from './tasks/tasks.controller';
-import { TasksModule } from './tasks/tasks.module';
-import { ListsModule } from './lists/lists.module';
-// import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TasksModule } from './tasks/tasks.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  controllers: [TasksController],
-  providers: [TasksService],
+  providers: [],
+  exports: [],
   imports: [
     CategoriesModule,
-    TasksModule,
-    ListsModule,
     UsersModule,
+    TasksModule,
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI),
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly configService: ConfigService) {}
+}
