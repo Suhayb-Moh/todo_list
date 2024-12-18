@@ -12,12 +12,12 @@ export class CreateTaskDto {
   @IsNotEmpty({
     message: 'List ID is required',
   })
-  @IsNumber()
-  list_id: number;
+  list_id: string;
 
-  @IsOptional()
-  @IsNumber()
-  category_id: number;
+  @IsNotEmpty({
+    message: 'List ID is required',
+  })
+  category_id: string;
 
   @IsNotEmpty({
     message: 'Task name is required',

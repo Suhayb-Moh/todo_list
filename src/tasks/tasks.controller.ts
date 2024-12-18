@@ -6,18 +6,36 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  create(@Body() createTaskDto: CreateTaskDto) {
-    return this.tasksService.create(createTaskDto);
+  create(@Body() createTaskDto: CreateTaskDto, @Req() req) {
+    const userId = req.user.userId;
+    return this.tasksService.create({
+      ...createTaskDto,
+      user_id: userId,
+    } as any);
+  }
+
+  @Get('list/:listId')
+  findAllByListId(@Param('listId') listId: string) {
+    return this.tasksService.findall(listId);
+  }
+
+  @Get('category/:categoryId')
+  findAllByCategoryId(@Param('categoryId') categoryId: string) {
+    return this.tasksService.findByCategoryId(categoryId);
   }
 
   @Get()
