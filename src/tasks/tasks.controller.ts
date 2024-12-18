@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -39,8 +40,31 @@ export class TasksController {
   }
 
   @Get()
-  findAll() {
-    return this.tasksService.findAll();
+  findAll(
+    @Query('name') name?: string,
+    @Query('description') description?: string,
+    @Query('due_date') due_date?: string,
+    @Query('priority') priority?: number,
+    @Query('completed') completed?: boolean,
+    @Query('category_id') category_id?: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Query('sortBy') sortBy = 'due_date',
+    @Query('sortOrder') sortOrder: 'asc' | 'desc' = 'asc',
+  ) {
+    return this.tasksService.findAll(
+      {
+        name,
+        description,
+        due_date: due_date ? new Date(due_date) : undefined,
+        priority,
+        completed,
+      },
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    );
   }
 
   @Get(':id')

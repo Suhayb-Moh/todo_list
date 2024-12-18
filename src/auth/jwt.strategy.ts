@@ -15,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
   async validate(payload: any) {
     // Implement custom logic to validate JWT payload and return user data
-    if (!payload.userId) {
+    if (!payload.sub) {
       throw new UnauthorizedException('Invalid token payload');
     }
     return { userId: payload.sub, email: payload.email };

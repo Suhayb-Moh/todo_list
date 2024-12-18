@@ -41,8 +41,71 @@ export class TasksService {
       .exec();
   }
 
-  async findAll(): Promise<Task[]> {
-    return this.taskModel.find().exec();
+  // async findAll(): Promise<Task[]> {
+  //   return this.taskModel.find().exec();
+  // }
+
+  async findAll(
+    filters: {
+      name?: string;
+      description?: string;
+      due_date?: Date;
+      priority?: number;
+      completed?: boolean;
+      category_id?: string;
+    } = {},
+    page: number = 1,
+    limit: number = 10,
+    sortBy: string = 'due_date',
+    sortOrder: 'asc' | 'desc' = 'asc',
+  ): Promise<{ tasks: Task[]; total: number; page: number; limit: number }> {
+    const query: any = {};
+
+    // Add search and filter conditions to the query object
+    if (filters.name) {
+      query.name = new RegExp(filters.name, 'i');
+    }
+    if (filters.description) {
+      query.description = new RegExp(filters.description, 'i');
+    }
+    if (filters.due_date) {
+      query.due_date = { $gte: filters.due_date };
+    }
+    if (filters.priority) {
+      query.priority = filters.priority;
+    }
+    if (filters.completed) {
+      query.completed = filters.completed;
+    }
+    if (filters.category_id) {
+      query.category_id = filters.category_id;
+    }
+    if (typeof filters.completed !== 'undefined')
+      query.compare = filters.completed;
+
+    const skip = (page - 1) * limit; // Calculate the number of ducoments to skip
+
+    // Construct valid sort object
+    const allowedSortFields = ['due_date', 'priority', 'name'];
+    if (!allowedSortFields.includes(sortBy)) {
+      throw new Error('Invalid sort field');
+    }
+    const sortOrderValue = sortOrder === 'asc' ? 1 : -1;
+    const sort: Record<string, 1 | -1> = { [sortBy]: sortOrderValue };
+
+    try {
+      // Fetch tasks with pagination and sorting
+      const tasks = await this.taskModel
+        .find(query)
+        .skip(skip)
+        .limit(limit)
+        .sort(sort)
+        .exec();
+      const total = await this.taskModel.countDocuments(query).exec(); // Total number of tasks matching the query
+      return { tasks, total, page, limit };
+    } catch (error) {
+      throw new Error('Error fetching tasks:' + error.message);
+    }
   }
 
   async findOne(id: string): Promise<Task> {

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ListService } from './list.service';
 import { CreateListDto } from './dto/create-list.dto';
@@ -21,8 +22,25 @@ export class ListController {
   }
 
   @Get()
-  findAll() {
-    return this.listService.findAll();
+  findAll(
+    @Query('name') name?: string,
+    @Query('user_id') userId?: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('sortBy') sortBy: string = 'name',
+    @Query('sortOrder') sortOrder: 'asc' | 'desc' = 'asc',
+  ) {
+    return this.listService.findAll(
+      {
+        name,
+        user_id: userId,
+      },
+
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    );
   }
 
   @Get('user/:userId')
